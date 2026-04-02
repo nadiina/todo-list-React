@@ -1,3 +1,28 @@
+# To-Do List
+
+**Студентка:** Щербина Надія
+
+**Група:** КВ-51мн
+
+**Лабораторна робота:** №1 - Програмування Web-інтерфейсів
+
+Завдання: розробити клієнтську частину Web-додатку.
+
+## Опис завдання
+Проєкт надає користувачам зручний інструмент для планування часу, запис планів та відстеження прогресу їх виконання за допомогою адаптивного веб-інтерфейсу
+
+## Посилання на звіт 
+https://docs.google.com/document/d/1YmhIN82YpImv4GaYvgq7t9hDBY8nAFvgoi9E-kXCBRY/edit?usp=sharing
+
+## Технології
+* **React**
+* **Tailwind**
+* **Axios**
+* **React Router DOM**
+* **Lucide React**
+
+## Встановлення та запуск
+
 # React + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
