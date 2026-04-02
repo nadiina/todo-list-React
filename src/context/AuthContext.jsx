@@ -11,21 +11,22 @@ export const AuthProvider = ({ children }) => {
         const savedUser = localStorage.getItem('user');
         const token = localStorage.getItem('token');
         if (savedUser && token) {
-            setUser(JSON.parse(savedUser));
+            try {
+                setUser(JSON.parse(savedUser));
+            } catch (error) {
+                console.error("User data parsing error:", error);
+            }
         }
         setLoading(false);
     }, []);
 
     const registerUser = async (userData) => {
         try {
-
             const response = await api.post('register/', userData);
 
-            /* const { token, user } = response.data;
-            localStorage.setItem('token', token);
-            localStorage.setItem('user', JSON.stringify(user));
-            setUser(user);
-            */
+            if (userData.username && userData.password) {
+                await login(userData.username, userData.password);
+            }
 
             return response.data;
         } catch (error) {
@@ -34,37 +35,35 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
-    const login = async (email, password) => {
-        if (email === 'admin@example.com' && password === '123456') {
-            const fakeUser = {
-                id: 1,
-                username: 'Nadiia',
-                email: 'admin@example.com',
-                first_name: 'Надія',
-                gender: 'Жіноча',
-                birth_date: '2000-08-15'
-            };
-            setUser(fakeUser);
-            localStorage.setItem('user', JSON.stringify(fakeUser));
-            localStorage.setItem('token', 'fake-token-123');
-            return true;
-        }
-
-        /*
+    const login = async (username, password) => {
         try {
-            const response = await api.post('login/', { username: email, password });
-            const { token, user } = response.data;
+            const response = await api.post('login/', { username, password });
+            const { token } = response.data;
 
             localStorage.setItem('token', token);
-            localStorage.setItem('user', JSON.stringify(user));
-            setUser(user);
+
+            let userDataObj = { username };
+
+            try {
+                const profileResponse = await api.get('profile/');
+
+                const profileData = Array.isArray(profileResponse.data)
+                    ? profileResponse.data[0]
+                    : profileResponse.data;
+
+                userDataObj = { ...userDataObj, ...profileData };
+            } catch (profileError) {
+                console.warn("Failed to load profile details, using only username", profileError);
+            }
+
+            localStorage.setItem('user', JSON.stringify(userDataObj));
+            setUser(userDataObj);
+
             return true;
         } catch (error) {
-            throw new Error('Невірний логін або пароль');
+            console.error("Login error:", error);
+            throw new Error('Invalid username or password');
         }
-        */
-
-        throw new Error('Невірний email або пароль (Mock check)');
     };
 
     const logout = () => {
@@ -81,30 +80,9 @@ export const AuthProvider = ({ children }) => {
             registerUser,
             loading
         }}>
-            {children}
+            {!loading && children}
         </AuthContext.Provider>
     );
-};
-
-const login = async (usernameOrEmail, password) => {
-    try {
-
-        const response = await api.post('login/', {
-            username: usernameOrEmail,
-            password: password
-        });
-
-        const { token } = response.data;
-
-        localStorage.setItem('token', token);
-
-        setUser({ username: usernameOrEmail });
-
-        return true;
-    } catch (error) {
-        console.error("Login error:", error);
-        throw error;
-    }
 };
 
 export const useAuth = () => useContext(AuthContext);
